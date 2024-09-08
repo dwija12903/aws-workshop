@@ -1,0 +1,77 @@
+**For better Understanding view its markdown file
+
+********************AGENDA of March 17,2024***************
+1. Understanding Region
+2. Aws Services 
+3. Undeerstanding of EC2
+4. Practical Experience of EC2
+5. Web server Creation and setup
+6. Deploy static website using Windows server
+============================================
+>>>>
+- services
+- compute-EC2
+- change server to Mumbai
+- launch instance
+- name the server
+- Search for Ami
+- connect Microsoft operating system: Microsoft Windows Server 2022 Base
+- instance type: t2.micro, it has 1CPU,1GB memory
+- key-pair: create- dwijakey  .pem- name the key- click create key- a file will be downloaded
+- by default username is: administration
+- n/w setting- edit- vpc must default - subnet can be chosen any but I have chosen no preferences so it was chosen by it self- auto assign IP must be enabled
+- Firewall- create security group name=dwijaSecurityGroup -  description is optional -  Inbound Security Group Rules(here we create a group)=souce type=anywhere
+- Configure storage=30GB SSD
+- No. of instance = 1
+-  Launch instance
+-   View All instance 
+- Reload it- then the status check will be 2/2.
+===========================================================
+To know machine credentials.
+- The public IP of a remote machine known as Domain IP is DNS. 
+- Tick the instance- below we can get public IP and private IP - copy public IP
+ 	Public IP= 13.126.122.178
+	DNS = ec2-13-126-122-178.ap-south-1.compute.amazonaws.com
+	Port = 3389 (by default of rdp)
+	username = Administration(by default)
+	password-select instance- click connect- 2nd tag RDP client- (from the file downloaded we cant know pw) - get pw - upload file and decrypt it- copy pw 
+			pw = ZruKnCO?OGB00Li(p1Ir)?62*d1j6UfV
+- Go to the start button of PC - then RDP search- Click remote desktop connection - enter PublicIP - connect - change the user name to administrator- enter Password-connect
+=============================================================
+Cost in Virginia is low, to calculate the cost, you can go onto Google and search
+About Netflix, it used PaaS in AWS and applied a lot of cost to it. (more than 300cr of monthly billing)
+Netflix, LinkedIn, Hotstar, and facebook - all companies pay's to AWS and many other companies.
+======================================================================
+to create web-services is a deployment service through HTTPS type pf service
+most webserver are written in c++, android is a linux OS, Android and IoS is written in C Language 
+IIS web service we will use.
+
+Till above we have set all the infrastructure, OS is a platform in which we will create a web service that is s/w
+This is a machine located in the Mumbai Region
+
+- Open machine
+- Start
+- Control Panel - windows Feature on/off (Use to create web server)
+- Then a window will open- do next next till the last step - but do select IIS web service in Server roles.
+- Takes 5 mins -  Then close all and go back to the desktop
+-  Go to Microsoft Edge - type localhost - if a blue screen comes then successful 
+- (to deploy on) Select Instance- go to security column - click on security key - edit Inbound rules 
+	- Add rule - Http - anywhere Ipv4 - Add rule
+- Search for public IP on Google then you can see your website, now these websites can be opened on any device
+- web route is where we have web services
+- pc >> drive c >> inetpub >> wwwroot on virtual PC. 
+	- Create Index file there >> EDIT it >> save as all files >> then refresh server 
+- Django and React have a different process, and Python also.
+- add anything in the wwwroot folder, and you will see it on your  Website - by copy from pc and pasting it in the Vm wwwroot folder 
+===========================================
+Closes the instance
+- EC2 Dashboard, no. of instances >>  select which one you want to delete
+-  select instance type >> 
+- Action >> change instance setting >> change the termination protection >> enable it >> save it (this will protect from closing all the servers in the instance)
+-  Change protection >> disable >>  Instance State >> Teminate 
+======================================================
+
+
+
+
+

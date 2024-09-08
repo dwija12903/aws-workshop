@@ -1,0 +1,47 @@
+**For better Understanding view its markdown file
+
+For react.js deployment website in the Cloud 
+AWS Amplify service for React, Android, Apple, View, Javascript
+AWS Amplify 
+
+- Go to Amazon Amplify
+- npm react-create-app dwicloud
+- npm run build 
+- serve build
+- Ampfiy Hosting 
+- Deploy Without git 
+- Compress all the build files into a folder and not the entire build folder
+- Set AppName- environment name(any) - drag zipped folder names static
+- Save and deploy and then open the DNS domain link
+- Action >> Delete it 
+===========================================================
+EC2 Ubuntu
+- Instance 
+- Launch Instance 
+- Name server- Ubuntu - Create key value pair - using ppm  - Create pair
+- N/w Setting - Edit - No preference subnet - SSH port= 22 - Source Type = Anywhere  
+-  Summary -  No. of instance=1
+-  Click on Instance - see all the IP's
+	Public=65.0.133.103
+	user=ubuntu (by default)
+	password in ubuntu is not required, we will activate using git bash commands
+- Git Bash commands to activate ubuntu server 
+	ls *.pem
+	ls -la *.pem
+	chmod 400 key.pem
+	ls -la *.pem
+	ssh -i "key.pem" ubuntu@65.0.133.103	      (in this, ip address and then enter, then type yes then enter)
+	ls
+	sudo apt update 	(same a pip)
+	(multiuser - same machine can be used by many users)
+	sodo su (so that no need of writing sudo)
+	apt update 
+	cat /etc/passwd 	(/=root)(how many users are created)
+	 adduser dwija
+go to cmd
+	ssh dwija@65.0.133.103
+in gitbash
+	cd /etc/ssh
+	pwd
+	(config.sshg files contents all the details of user)
+	vi sshd_config

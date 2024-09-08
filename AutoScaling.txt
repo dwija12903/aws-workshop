@@ -1,0 +1,95 @@
+**For better Understanding view its markdown file
+
+Agenda What is auto-scaling? 
+Understanding the Image Understanding templates Understanding AMI Understanding auto-scaling groups Creating notification (SNS Service) Creating Alarm (CloudWatch Service) Add auto-scaling policies 
+============ Web Hosting/Web App Hosting Using AWS EC2/Load Balancer/Auto Scaling single instance Auto Scaling============
+* Amazon EC2 Auto Scaling features have no additional fees beyond the service fees for Amazon EC2, CloudWatch (for scaling policies), and the other AWS resources that you use. 
+* Auto Scaling helps you ensure that you have the correct number of EC2 instances available to handle the load for your application. 
+* It means the collections of EC2 instances, called Auto Scaling groups. 
+* You can specify the minimum number of instances and the maximum number of instances in the Auto Scaling group. ============================================================================ 
+1. Launch Instance EC2-Dashboard -> Launch Instance 1. Choose AMI 2. Choose Instance Type 3. Configure Instance 4. Add Storage 5. Add Tags 6. Configure Security Group(myAppSG) 7. Review 
+2. Verify the PasswordAuthentication set yes or no (if no, then make it change no to yes)  
+	grep "PasswordAuthentication" /etc/ssh/sshd_config 
+3. Enable PasswordAuthentication from no to yes (users can login through password also) 
+	sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config 
+	*Also set KDB Interactive session yes (this comes in new configuration) 
+4. Re-Verify whether the PasswordAuthentication is updated or not 
+	grep "PasswordAuthentication" /etc/ssh/sshd_config 
+5. Restart service sshd (so that updates can reflect)
+	 systemctl restart sshd 
+======================================================================= 
+6. Set Password for the user "ubuntu" 
+	sudo su - passwd ubuntu New password: 12345 Retype new password: 12345
+ 7. Install Packages sudo su - (switch user to root) 
+	apt update apt install apache2 -y (install web server) 
+	systemctl start apache2 (start the web server, if not started) 
+	apt install mysql-server (install mysql) 
+	mysql_secure_installation (configure mysql) 
+	apt install unzip
+ =================================================================== 
+8. In windows git-bash -> goto project folder (cd path) 
+9. Copy project from Windows to AWS EC2 webServer scp tnpLab.zip ubuntu@13.233.247.4:/home/ubuntu =================================================================== 
+10. Goto webServer Copy tnpLab.zip to webroot directory cp tnpLab.zip /var/www/html/ 
+	Remove Default index.html rm index.html Unzip tnpLab.zip unzip tnpLab.zip 
+11. Verify whether the web application is working or not (IP/DNS enter in your browser and verify this) ========================================================================== 
+12. If Working successfully then make a template of the existing webServer
+	 select webServer -> Action -> Image and templates -> create template from instance -> Launch template name: tnpLabWebServerImage Template version description: 	this is version 1 of the tnpLab web server 
+	AMI: use default I
+	nstance type: t2.micro 
+	Key Pair: vinay45 
+	Network Settings: Virtual Private Cloud (VPC) 
+	Security Group: myAppSG 
+	Storage: .......... Resource Tag: ........ Network Interface: .......(If you have selected then remove this) 
+13. Verify whether the template is created or not EC2-Dashboard -> Instance -> Launch Templates
+ =============Load Balancer============================
+14. Create Targets Load Balancing -> Target Groups -> Create target group Step 
+	1: Specify group details Basic configuration Choose a target type: instances Target group name: myTgtLB Protocol: HTTP Port: 80 VPC: Default Protocol version: HTTP1 	Health checks -> Health check protocol: HTTP Health check path: / Advanced health check settings: Traffic ports Healthy threshold: 2 Unhealthy threshold: 2 Timeout: 5 	Interval: 10 Success codes: 200 Summary: Verify all details before creating. 
+	Click on: Next Step 
+	2: Register targets Register targets -> Available instance (select available one) -> Ports 80, include as pending below Click on Create Target group 
+15. Create a Load Balancer Load Balancing -> Load Balancers -> Create Load Balancer -> Select load balancer type -> (Load balancer has 4 types right now, and Classic Load 	Balancer - previous generation and this will be discontinued in few months) 
+	AWS will be retiring the EC2-Classic Platform on 08/15/2022. 	
+	(https://aws.amazon.com/elasticloadbalancing/features/#Product_comparisons) 
+	Application Load Balancer -> Create Load balancer name: myAPPtnpLB Network mapping: VPC (this time I am selecting default, but you can also select your created VPC) 	Mappings: ap-south-1a, ap-south-1b 
+	Security Group: myAppSG 
+	Listeners and routing: Protocol: HTTP, Port: 80, Default Action: myTgtLB 
+	Summary: Verify all details before creating. Click on: Create a load balancer View load balancer 
+16. Verify Load Balancer is working or not DNS: myAPPtnpLB-538943151.ap-south-1.elb.amazonaws.com (open in internet browser) 
+===================Auto Scaling========Launch Configurations============================== 
+17. Auto Scaling Launch Configurations -> (but I have already created a template, so I can use that one) 
+=============Simple Notification Service=SNS===================================== 
+18. Create a Topic in SNS Services -- Application Integration -- Simple Notification Service Create Topic: myserverSNS Type - Standard Name - myWebServer-Notification Display 	Name - myWebServer-Notification Click on "Create topic" 
+	Add subscriptions to the topic Create Subscription Protocol - Email Endpoint - tnplabs@gmail.com Click on "Create Subscription" Confirm the subscription (go to your 	mail and confirm) 
+================Auto Scaling=====Auto Scaling Group=================================== 
+19. Create an Auto Scaling Group Select the Launch Configuration -> Actions -> Create Auto Scaling Group 
+	Step 1: Auto Scaling group name: mytnpLabAG Launch template: tnpLabWebServerImage (already created) 
+	Step 2: Subnet -- ap-south-1a ap-south-1b 
+	Step 3: Attach Existing Load Balancer -> Choose from your load balancer target groups -> Existing load balancer target groups -> myTgtLB | HTTP 
+	Step 4: Configure Group size Desired capacity: 4 Minimum capacity: 4 Maximum capacity: 100 (it's up to you) 
+	Step 5: Next 
+	Step 6: Next -- Provide Name Tag 
+	Step 7: Review and Create As the desired capacity is 4, By this time four EC2 machines could have been created. *Verify Goto EC2 Dashboard -> Instance =============CloudWatch================================================================== 
+20. Create an Alarm in CloudWatch Services -> Management & Governance -> CloudWatch Alarms -> Create Alarms 
+*Here I will create two alarms 
+========myAlarm1============================== 
+Select Metric -> EC2 -> By Auto Scaling Group -> Select Auto Scaling Group Name: mytnpLabAG, Metric Name: CPUUtilization -> Select Metric -> 
+	Step 1: Specify metrics and conditions Conditions -> Static -> Greater/Equal than 75 -> Next -> 
+	Step 2: Select existing SNS topic (myWebServer-Notification) -> Next -> 
+	Step 3: Add name and description Alarm Name: myAlarm1 -> Next 
+	Step 4: Create Alarm
+========myAlarm2============================== 
+Similarly Create another Alarm for CPU Utilization < 40 Select Metric -> EC2 -> By Auto Scaling Group -> Select Auto Scaling Group Name: mytnpLabAG, Metric Name: CPUUtilization -> Select Metric -> 
+	Step 1: Specify metrics and conditions Conditions -> Static -> Lower/Equal than 40 -> Next -> 
+	Step 2: Select existing SNS topic (myWebServer-Notification) -> Next -> 
+	Step 3: Add name and description Alarm Name: myAlarm2 -> Next 
+	Step 4: Create Alarm 
+====================Add Policy in Auto Scaling===============
+21. Add Policy in Auto Scaling Select AutoScaling groups -> Automatic Scaling Tab -> Add Policy Create a dynamic scaling policy Policy Type - Simple Scaling Scaling policy name: Increase_Policy CloudWatch Alarm: myAlarm1 Take the Action - Add - 1 Unit ( EC2 Machine ) Create 
+============================================================= 
+Similarly, we need to create another Decrease in Policy Scaling policy name: Decrease_Policy CloudWatch Alarm: myAlarm2 Take the Action - Remove - 1 Unit ( EC2 Machine ) Create 
+============================================================================= 
+22. Deleting process 
+	1. Delete Autoscaling 
+	2. Delele launch configuration ( Instances will be terminated automatically) 
+	3. Delete Load balancer 
+	4. Delete Topic 
+	5. Delete Alarm
